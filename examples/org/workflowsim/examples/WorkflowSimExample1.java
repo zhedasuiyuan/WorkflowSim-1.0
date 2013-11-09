@@ -56,6 +56,11 @@ import org.workflowsim.utils.Parameters;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
+/**
+ * make some changes
+ * @author zhiming
+ *
+ */
 public class WorkflowSimExample1 {
 
     private static List<CondorVM> createVM(int userId, int vms) {
