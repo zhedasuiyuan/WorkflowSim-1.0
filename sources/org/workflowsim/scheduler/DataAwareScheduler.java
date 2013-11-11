@@ -41,7 +41,6 @@ public class DataAwareScheduler extends BaseScheduler {
 
     @Override
     public void run() {
-
         
         int size = getCloudletList().size();
 

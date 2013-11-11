@@ -322,7 +322,7 @@ public class CloudSimExample8 {
 
 		@Override
 		public void startEntity() {
-			Log.printLine(super.getName()+" is starting...");
+			Log.printLine(super.getName()+" is starting...at"+CloudSim.clock());
 			schedule(getId(), 200, CREATE_BROKER);
 		}
 

@@ -43,6 +43,9 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
  * The cloudlets will take different time
  * to complete the execution depending on
  * the requested VM performance.
+ * 
+ * Broker is only responsible for creating the VMs and the cloudoutlets, which is simular to the cloud users. And the process of 
+ * creating the datacenter will take care of the hosts and the characteristics of the hosts.
  */
 public class CloudSimExample3 {
 

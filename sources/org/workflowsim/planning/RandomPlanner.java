@@ -27,6 +27,8 @@ import org.workflowsim.utils.Parameters;
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Jun 17, 2013
+ * 
+ * What's the relationship between planning and scheduling? I didn't see much difference between this two kind of functions.
  */
 public class RandomPlanner extends BasePlanner {
 

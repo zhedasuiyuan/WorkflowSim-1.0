@@ -43,6 +43,7 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
  * VMs with the same MIPS requirements.
  * The cloudlets will take the same time to
  * complete the execution.
+ * 
  */
 public class CloudSimExample2 {
 
@@ -140,7 +141,7 @@ public class CloudSimExample2 {
 
 
 	            	// Final step: Print results when simulation is over
-	            	List<Cloudlet> newList = broker.getCloudletReceivedList();
+	            	List<Cloudlet> newList = broker.getCloudletReceivedList();//whether it should be called before or after stopSimulation
 
 	            	CloudSim.stopSimulation();
 

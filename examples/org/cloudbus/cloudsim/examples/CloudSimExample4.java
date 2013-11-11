@@ -39,6 +39,8 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
  * A simple example showing how to create
  * two datacenters with one host each and
  * run two cloudlets on them.
+ * 
+ * based on this example, we still do not know the scheduling details such as where does the vm allocated.
  */
 public class CloudSimExample4 {
 
@@ -252,6 +254,9 @@ public class CloudSimExample4 {
 			if (cloudlet.getCloudletStatus() == Cloudlet.SUCCESS){
 				Log.print("SUCCESS");
 
+				/**
+				 * How can I get the hostId?
+				 */
 				Log.printLine( indent + indent + cloudlet.getResourceId() + indent + indent + indent + cloudlet.getVmId() +
 						indent + indent + dft.format(cloudlet.getActualCPUTime()) + indent + indent + dft.format(cloudlet.getExecStartTime())+
 						indent + indent + dft.format(cloudlet.getFinishTime()));

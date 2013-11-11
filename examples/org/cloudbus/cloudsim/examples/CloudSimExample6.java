@@ -55,7 +55,7 @@ public class CloudSimExample6 {
 		//VM Parameters
 		long size = 10000; //image size (MB)
 		int ram = 512; //vm memory (MB)
-		int mips = 1000;
+		int mips = 1000;//MIPS cann't be bigger than the host
 		long bw = 1000;
 		int pesNumber = 1; //number of cpus
 		String vmm = "Xen"; //VMM name
@@ -129,7 +129,7 @@ public class CloudSimExample6 {
 			int brokerId = broker.getId();
 
 			//Fourth step: Create VMs and Cloudlets and send them to broker
-			vmlist = createVM(brokerId,20); //creating 20 vms
+			vmlist = createVM(brokerId,10); //creating 20 vms
 			cloudletList = createCloudlet(brokerId,40); // creating 40 cloudlets
 
 			broker.submitVmList(vmlist);
