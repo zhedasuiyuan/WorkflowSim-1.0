@@ -30,7 +30,7 @@ import org.workflowsim.utils.Parameters;
  * 
  * What's the relationship between planning and scheduling? I didn't see much difference between this two kind of functions.
  */
-public class RandomPlanner extends BasePlanner {
+public class RandomPlanningAlgorithm extends BasePlanningAlgorithm {
 
     /**
      * The main function
@@ -38,7 +38,7 @@ public class RandomPlanner extends BasePlanner {
     @Override
     public void run() {
 
-
+        Random random = new Random(System.currentTimeMillis());
         for (Iterator it = getTaskList().iterator(); it.hasNext();) {
             Task task = (Task) it.next();
             double duration = task.getCloudletLength() / 1000;
@@ -56,7 +56,7 @@ public class RandomPlanner extends BasePlanner {
             /**
              * Randomly choose a vm
              */
-            Random random = new Random((long)duration);
+            
             int vmId = random.nextInt(vmNum);
             
             CondorVM vm = (CondorVM) getVmList().get(vmId);
