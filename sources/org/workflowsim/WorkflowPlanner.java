@@ -188,9 +188,7 @@ public class WorkflowPlanner extends SimEntity {
             case RANDOM:
                 planner = new RandomPlanner();
                 break;
-            case HEFT:
-            	planner = new HEFTPlanner();
-            	break;
+            
             default:
                 planner = null;
                 break;
