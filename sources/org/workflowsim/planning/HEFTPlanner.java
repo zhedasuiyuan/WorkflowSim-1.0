@@ -12,7 +12,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- *//*
+ */
 package org.workflowsim.planning;
 
 import java.util.ArrayList;
@@ -26,13 +26,13 @@ import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Task;
 
-*//**
+/**
  * The HEFT planning algorithm.
  * 
  * @author Pedro Paulo Vezzá Campos
  * @date Oct 12, 2013
- *//*
-public class HEFTPlanner extends BasePlanner {
+ */
+public class HEFTPlanner extends BasePlanningAlgorithm {
         private Map<Task, Map<CondorVM, Double>> computationCosts;
         private Map<Task, Map<Task, Double>> transferCosts;
         private Map<Task, Double> rank;
@@ -77,9 +77,9 @@ public class HEFTPlanner extends BasePlanner {
                 schedules = new HashMap<>();
         }
 
-        *//**
+        /**
          * The main function
-         *//*
+         */
         @Override
         public void run() {
                 Log.printLine("HEFT planner running with " + getTaskList().size()
@@ -101,11 +101,11 @@ public class HEFTPlanner extends BasePlanner {
                 allocateTasks();
         }
 
-        *//**
+        /**
          * Calculates the average available bandwidth among all VMs in Mbit/s
          * 
          * @return Average available bandwidth in Mbit/s
-         *//*
+         */
         private double calculateAverageBandwidth() {
                 double avg = 0.0;
                 for (Object vmObject : getVmList()) {
@@ -115,10 +115,10 @@ public class HEFTPlanner extends BasePlanner {
                 return avg / getVmList().size();
         }
 
-        *//**
+        /**
          * Populates the computationCosts field with the time in seconds to compute
          * a task in a vm.
-         *//*
+         */
         private void calculateComputationCosts() {
                 for (Object taskObject : getTaskList()) {
                         Task task = (Task) taskObject;
@@ -138,10 +138,10 @@ public class HEFTPlanner extends BasePlanner {
                 }
         }
 
-        *//**
+        /**
          * Populates the transferCosts map with the time in seconds to transfer all
          * files from each parent to each child
-         *//*
+         */
         private void calculateTransferCosts() {
                 // Initializing the matrix
                 for (Object taskObject1 : getTaskList()) {
@@ -166,14 +166,14 @@ public class HEFTPlanner extends BasePlanner {
                 }
         }
 
-        *//**
+        /**
          * Accounts the time in seconds necessary to transfer all files described
          * between parent and child
          * 
          * @param parent
          * @param child
          * @return Transfer cost in seconds
-         *//*
+         */
         private double calculateTransferCost(Task parent, Task child) {
                 List<File> parentFiles = (List<File>) parent.getFileList();
                 List<File> childFiles = (List<File>) child.getFileList();
@@ -197,9 +197,9 @@ public class HEFTPlanner extends BasePlanner {
                 return acc * 8 / averageBandwidth;
         }
 
-        *//**
+        /**
          * Invokes calculateRank for each task to be scheduled
-         *//*
+         */
         private void calculateRanks() {
                 for (Object taskObject : getTaskList()) {
                         Task task = (Task) taskObject;
@@ -207,14 +207,14 @@ public class HEFTPlanner extends BasePlanner {
                 }
         }
 
-        *//**
+        /**
          * Populates rank.get(task) with the rank of task as defined in the HEFT
          * paper.
          * 
          * @param task
          *            The task have the rank calculates
          * @return The rank
-         *//*
+         */
         private double calculateRank(Task task) {
                 if (rank.containsKey(task))
                         return rank.get(task);
@@ -238,9 +238,9 @@ public class HEFTPlanner extends BasePlanner {
                 return rank.get(task);
         }
 
-        *//**
+        /**
          * Allocates all tasks to be scheduled in non-ascending order of schedule.
-         *//*
+         */
         private void allocateTasks() {
                 List<TaskRank> taskRank = new ArrayList<>();
                 for (Task task : rank.keySet()) {
@@ -255,14 +255,14 @@ public class HEFTPlanner extends BasePlanner {
 
         }
 
-        *//**
+        /**
          * Schedules the task given in one of the VMs minimizing the earliest finish
          * time
          * 
          * @param task
          *            The task to be scheduled
          * @pre All parent tasks are already scheduled
-         *//*
+         */
         private void allocateTask(Task task) {
                 CondorVM chosenVM = null;
                 double earliestFinishTime = Double.MAX_VALUE;
@@ -296,7 +296,7 @@ public class HEFTPlanner extends BasePlanner {
                 task.setVmId(chosenVM.getId());
         }
 
-        *//**
+        /**
          * Finds the best time slot available to minimize the finish time of the
          * given task in the vm with the constraint of not scheduling it before
          * readyTime. If occupySlot is true, reserves the time slot in the schedule.
@@ -310,7 +310,7 @@ public class HEFTPlanner extends BasePlanner {
          * @param occupySlot
          *            If true, reserves the time slot in the schedule.
          * @return The minimal finish time of the task in the vmn
-         *//*
+         */
         private double findFinishTime(Task task, CondorVM vm, double readyTime,
                         boolean occupySlot) {
                 List<Event> sched = schedules.get(vm);
@@ -383,4 +383,4 @@ public class HEFTPlanner extends BasePlanner {
                 return finish;
         }
 
-}*/
+}

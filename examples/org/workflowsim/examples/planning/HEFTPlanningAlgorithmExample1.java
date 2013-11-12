@@ -100,11 +100,12 @@ public class HEFTPlanningAlgorithmExample1 {
              * the data center or the host doesn't have sufficient resources the
              * exact vmNum would be smaller than that. Take care.
              */
-            int vmNum = 5;//number of vms;
+            int vmNum = 2;//number of vms;
             /**
              * Should change this based on real physical path
              */
-            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
+//            String daxPath = "C:\\Users\\zhiming\\git\\WorkflowSim-1.0\\config\\dax\\Montage_100.xml";
+            String daxPath = "C:\\Users\\zhiming\\git\\WorkflowSim-1.0\\config\\dax\\HEFT_Paper.xml";
             
             File daxFile = new File(daxPath);
             if(!daxFile.exists()){
@@ -208,6 +209,7 @@ public class HEFTPlanningAlgorithmExample1 {
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
+        int hostId = 0;
         for (int i = 1; i <= 20; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
@@ -216,7 +218,7 @@ public class HEFTPlanningAlgorithmExample1 {
             peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
             peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
 
-            int hostId = 0;
+            
             int ram = 2048; //host memory (MB)
             long storage = 1000000; //host storage
             int bw = 10000;

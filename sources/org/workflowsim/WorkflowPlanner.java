@@ -17,11 +17,13 @@ package org.workflowsim;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.workflowsim.planning.BasePlanningAlgorithm;
+import org.workflowsim.planning.HEFTPlanner;
 import org.workflowsim.planning.HEFTPlanningAlgorithm;
 import org.workflowsim.planning.RandomPlanningAlgorithm;
 import org.workflowsim.utils.Parameters;
@@ -188,8 +190,10 @@ public class WorkflowPlanner extends SimEntity {
             case RANDOM:
                 planner = new RandomPlanningAlgorithm();
                 break;
+//TODO check whether this two algorithm generate the same result.
             case HEFT:
                 planner = new HEFTPlanningAlgorithm();
+//            	 planner=new HEFTPlanner();
                 break;
             default:
                 planner = null;

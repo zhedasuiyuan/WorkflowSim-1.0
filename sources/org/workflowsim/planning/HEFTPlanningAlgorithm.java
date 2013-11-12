@@ -86,7 +86,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                     }
                     fileSizes[parentIndex] = fileSize;
                     parentIndex ++;
-                }     
+                }  //each task has all its filesize of its parents
                 
                 double minTime = Double.MAX_VALUE;
                 int minTimeIndex = 0;
@@ -105,7 +105,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                         }
                         parentIndex ++;
                     }
-                    earliestStartTime[task.getCloudletId()][vm.getId()] = startTime;
+                    earliestStartTime[task.getCloudletId()][vm.getId()] = startTime;//This is the time when the parent finished the job
                     double runtime = task.getCloudletLength() / vm.getMips();
                     earliestFinishTime[task.getCloudletId()][vm.getId()] = runtime + startTime;
                     
