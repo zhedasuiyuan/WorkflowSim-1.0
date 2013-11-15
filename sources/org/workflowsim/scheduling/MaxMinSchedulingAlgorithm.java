@@ -25,6 +25,7 @@ import org.workflowsim.WorkflowSimTags;
 /**
  * MaxMin algorithm.
  *
+ *Max cloudset allocated to the vm with the max totalMips. Shouldn't it be the MaxMax??
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
@@ -50,7 +51,6 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         int size = getCloudletList().size();
         hasChecked.clear();
         for (int t = 0; t < size; t++) {
-            boolean chk = false;
             hasChecked.add(false);
         }
         for (int i = 0; i < size; i++) {
@@ -109,7 +109,7 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             }
             firstIdleVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
             maxCloudlet.setVmId(firstIdleVm.getId());
-            getScheduledList().add(maxCloudlet);
+            getScheduledList().add(maxCloudlet);//Noted that we have changes the status of the vms but didn't remove the cloudlets.
             Log.printLine("Schedules " + maxCloudlet.getCloudletId() + " with "
                     + maxCloudlet.getCloudletLength() + " to VM " + firstIdleVm.getId()
                     + " with " + firstIdleVm.getCurrentRequestedTotalMips());

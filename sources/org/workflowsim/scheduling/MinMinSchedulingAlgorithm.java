@@ -24,6 +24,9 @@ import org.workflowsim.WorkflowSimTags;
 /**
  * MinMin algorithm.
  *
+ *Every time we may have several cloudlets and vms available at the same time. So we schedule the cloudlet one by one based on our strategies. 
+ *In minmin, it schedules the minimum cloudlet first. Then the cloudlet with the 2th smaller one
+ *Min means Min time I think!
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
@@ -75,7 +78,7 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                     minIndex = j;
                 }
             }
-            hasChecked.set(minIndex, true);
+            hasChecked.set(minIndex, true);// I am not quite sure about what does hascheck function?
 
             int vmSize = getVmList().size();
             CondorVM firstIdleVm = null;//(CondorVM)getVmList().get(0);

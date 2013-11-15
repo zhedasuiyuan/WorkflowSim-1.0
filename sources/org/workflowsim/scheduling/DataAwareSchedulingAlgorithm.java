@@ -47,7 +47,7 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         for (int i = 0; i < size; i++) {
 
             Cloudlet cloudlet = (Cloudlet) getCloudletList().get(i);
-            if(cloudlet.getCloudletId() == 38){
+            if(cloudlet.getCloudletId() == 38){//why this?
                 Log.printLine();
             }
 
@@ -56,11 +56,9 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             double minTime = Double.MAX_VALUE;
             for (int j = 0; j < vmSize; j++) {
                 CondorVM vm = (CondorVM) getVmList().get(j);
-                if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
-                   
-                    
+                if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {                   
                     Job job = (Job)cloudlet;
-                    double time = dataTransferTime(job.getFileList(), cloudlet, vm.getId());
+                    double time = dataTransferTime(job.getFileList(), cloudlet, vm.getId());  //Notice that the time is not the real time but the filesize
                     if(time < minTime){
                         minTime = time;
                         closestVm = vm;
@@ -150,7 +148,7 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                 }
                 if(!hasFile){
-                    time += file.getSize() ;
+                    time += file.getSize() ;//Does the filesize equals to the size???
                 }
 
             }

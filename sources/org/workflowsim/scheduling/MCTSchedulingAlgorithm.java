@@ -23,6 +23,7 @@ import org.workflowsim.WorkflowSimTags;
 /**
  * MCT algorithm
  *
+ *In this algorithm, we do not compare the size of cloudlets.
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
@@ -51,7 +52,7 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                     break;
                 }
             }
-            if (firstIdleVm == null) {
+            if (firstIdleVm == null) { //at least we have one or more vms available
                 break;
             }
 

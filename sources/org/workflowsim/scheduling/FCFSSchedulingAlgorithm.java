@@ -40,7 +40,6 @@ public class FCFSSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             Cloudlet cloudlet = (Cloudlet) it.next();
             boolean stillHasVm = false;
             for (Iterator itc = getVmList().iterator(); itc.hasNext();) {
-
                 CondorVM vm = (CondorVM) itc.next();
                 if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
                     stillHasVm = true;
@@ -50,7 +49,7 @@ public class FCFSSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                     break;
                 }
             }
-            //no vm available 
+            //no vm available Can not allocate the vms?
             if (!stillHasVm) {
                 break;
             }

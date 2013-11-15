@@ -78,7 +78,7 @@ public class CondorVM extends Vm {
          */
         setState(WorkflowSimTags.VM_STATUS_IDLE);
         /*
-         * If the file.system is LOCAL, we should add a clusterStorage to vm. 
+         * If the file.system is LOCAL, we should add a clusterStorage to vm.  why we should do this?
          */
         if (ReplicaCatalog.getFileSystem() == FileSystem.LOCAL) {
             try {
