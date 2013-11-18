@@ -77,7 +77,7 @@ public class WorkflowEngine extends SimEntity {
 
     }
 
-    public WorkflowEngine(String name, int schedulers) throws Exception {
+    public WorkflowEngine(String name, int schedulers) throws Exception { //there can be many schedulers? But we alway only use one scheduler!
         super(name);
 
         setJobsList(new ArrayList<Job>());
@@ -113,13 +113,13 @@ public class WorkflowEngine extends SimEntity {
     }
 
     public void submitVmList(List<? extends Vm> list) {
-
+//TODO
         //bug here, not sure whether we should have different workflow schedulers
         getScheduler(0).submitVmList(list);
         setVmList(list);
     }
     
-    public List<? extends Vm> getAllVmList(){
+    public List<? extends Vm> getAllVmList(){ //All the vms of all the schedulers
         if(this.vmList != null && !this.vmList.isEmpty()){
             return this.vmList;
         }
@@ -160,10 +160,10 @@ public class WorkflowEngine extends SimEntity {
                 break;
             //this call is from workflow scheduler when all vms are created
             case CloudSimTags.CLOUDLET_SUBMIT:
-                submitJobs();
+                submitJobs(); //Check the status of parents and get new ready tasks
                 break;
 
-            case CloudSimTags.CLOUDLET_RETURN:
+            case CloudSimTags.CLOUDLET_RETURN: //change some status and go to CLoudlet submit!
                 processJobReturn(ev);
                 break;
             // if the simulation finishes
@@ -217,7 +217,7 @@ public class WorkflowEngine extends SimEntity {
     }
    
     /**
-     * Process a submit event
+     * Process a submit event  The event happens when the clusterEngine ended.
      *
      * @param ev a SimEvent object
      */
@@ -303,6 +303,7 @@ public class WorkflowEngine extends SimEntity {
     protected void submitJobs() {
 
         List<Job> list = getJobsList();
+       
         Map allocationList = new HashMap<Integer, List>();
         for (int i = 0; i < getSchedulers().size(); i++) {
             List<Job> submittedList = new ArrayList<Job>();
@@ -312,12 +313,13 @@ public class WorkflowEngine extends SimEntity {
         for (int i = 0; i < num; i++) {
             //at the beginning
             Job job = list.get(i);
+//            Log.printLine("In the workflowEngine, the rank of the job is "+job.getRank()+" "+num);
             //Dont use job.isFinished() it is not right
             if (!hasJobListContainsID(this.getJobsReceivedList(), job.getCloudletId())) {
                 List<Job> parentList = job.getParentList();
                 boolean flag = true;
                 for (Job parent : parentList) {
-                    if (!hasJobListContainsID(this.getJobsReceivedList(), parent.getCloudletId())) {
+                    if (!hasJobListContainsID(this.getJobsReceivedList(), parent.getCloudletId())) {//should have parentId
                         flag = false;
                         break;
                     }
@@ -329,11 +331,11 @@ public class WorkflowEngine extends SimEntity {
                  */
                 if (flag) {
 
-                    List submittedList = (List) allocationList.get(job.getUserId());
+                    List submittedList = (List) allocationList.get(job.getUserId());//consider multiple schedulers
                     submittedList.add(job);
                     jobsSubmitted++;
-                    getJobsSubmittedList().add(job);
-                    list.remove(job);
+                    getJobsSubmittedList().add(job);//added in the submiited list!
+                    list.remove(job);               //Remove the job list!!!!!!!!
                     i--;
                     num--;
                 }

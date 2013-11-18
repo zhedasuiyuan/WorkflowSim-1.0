@@ -59,7 +59,7 @@ public class Parameters {
     public enum SchedulingAlgorithm {
 
         MAXMIN_SCH, MINMIN_SCH, MCT_SCH, DATA_SCH, 
-        STATIC_SCH, FCFS_SCH, INVALID_SCH
+        STATIC_SCH, FCFS_SCH, INVALID_SCH, HEFT_SCH
     }
     
     /**
@@ -195,6 +195,8 @@ public class Parameters {
         planningAlgorithm = planner;
         reduceMethod = rMethod;
         deadline = dl;
+        
+        Log.printLine(scheduler);
     }
 
     /**

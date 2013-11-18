@@ -133,16 +133,16 @@ public class WorkflowPlanner extends SimEntity {
      * @post $none
      */
     @Override
-    public void processEvent(SimEvent ev) {
+    public void processEvent(SimEvent ev) {  //Very important method!!!
         switch (ev.getTag()) {
-            case WorkflowSimTags.START_SIMULATION:
+            case WorkflowSimTags.START_SIMULATION: //This is the door???
                 getWorkflowParser().parse();
                 setTaskList(getWorkflowParser().getTaskList());
 
                 processPlanning();
 
                 processImpactFactors(getTaskList());
-                sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());
+                sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());// The control sequence goes to clusteringEngine!
                 break;
             case CloudSimTags.END_OF_SIMULATION:
                 shutdownEntity();
@@ -192,8 +192,8 @@ public class WorkflowPlanner extends SimEntity {
                 break;
 //TODO check whether this two algorithm generate the same result.
             case HEFT:
-                planner = new HEFTPlanningAlgorithm();
-//            	 planner=new HEFTPlanner();
+//                planner = new HEFTPlanningAlgorithm();
+            	 planner=new HEFTPlanner();
                 break;
             default:
                 planner = null;

@@ -17,9 +17,11 @@ package org.workflowsim.scheduling;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
+import org.workflowsim.Task;
 import org.workflowsim.WorkflowSimTags;
 
 /**
@@ -28,6 +30,8 @@ import org.workflowsim.WorkflowSimTags;
  * assigned a VM in this stage (in case your implementation of planning algorithm 
  * forgets it)
  *
+ *Even though we have finished the mapping in the planning phase, we still need to maintain the state of vm
+ *and the scheduled list, I guess these information are necessary for the the scheduling engine.
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Jun 17, 2013
@@ -47,20 +51,22 @@ public class StaticSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             CondorVM vm = (CondorVM)getVmList().get(i);
             if(vm!=null){
                 mId2Vm.put(vm.getId(), vm);
+//                Log.printLine("vm.getId "+vm.getId());  vmId start from 0
             }
         }
         
         int size = getCloudletList().size();
 
+        Log.printLine("The size of cloudlet is "+size);
         for(int i = 0; i < size; i++) {
-            Cloudlet cloudlet = (Cloudlet) getCloudletList().get(i);
+            Task cloudlet = (Task) getCloudletList().get(i);
             /**
              * Make sure cloudlet is matched to a VM. It should be done in the
              * Workflow Planner. If not, throws an exception because StaticSchedulingAlgorithm
              * itself does not do the mapping. 
              */
 
-            if(cloudlet.getVmId() < 0 || ! mId2Vm.containsKey(cloudlet.getVmId())){
+            if(cloudlet.getVmId() < 0 || ! mId2Vm.containsKey(cloudlet.getVmId())){// it means something was wrong.
 //                throw(new Exception("Cloudlet " + cloudlet.getCloudletId() + " is not matched."
 //                        + "Please configure scheduler_method in your config file"));
                 Log.printLine("Cloudlet " + cloudlet.getCloudletId() + " is not matched."
@@ -68,15 +74,17 @@ public class StaticSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                 cloudlet.setVmId(0);
                 
             }
+            Log.printLine("Try to schedule "+cloudlet.getCloudletId()+" with "+cloudlet.getCloudletLength()+" to VM "+cloudlet.getVmId());
             CondorVM vm = (CondorVM)mId2Vm.get(cloudlet.getVmId());
             if(vm.getState() == WorkflowSimTags.VM_STATUS_IDLE){   
                vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
                getScheduledList().add(cloudlet);
                Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
-                    + cloudlet.getCloudletLength() + " to VM " + cloudlet.getVmId()+". You haven't schedule it in the planning phase!");
+                    + cloudlet.getCloudletLength() + " to VM " + cloudlet.getVmId()+" rank "+cloudlet.getRank());
             }
 
          }
+        Log.printLine("------------------------------------------------------------------------------\n\n");
 
 
 

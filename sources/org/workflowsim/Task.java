@@ -64,7 +64,12 @@ public class Task extends Cloudlet {
      * The type of a task. 
      */
     private String type;
+    
+    /**
+     * The rank of a task
+     */
 
+    private double rank;
     /**
      * Allocates a new Task object. The task length should be greater than or
      * equal to 1.
@@ -93,6 +98,7 @@ public class Task extends Cloudlet {
         this.parentList = new ArrayList<Task>();
         this.fileList = new ArrayList<org.cloudbus.cloudsim.File>();
         this.impact = 0.0;
+        this.rank=0.0;
     }
 
     /**
@@ -292,4 +298,18 @@ public class Task extends Cloudlet {
     public double getImpact() {
         return this.impact;
     }
+
+	/**
+	 * @return the rank
+	 */
+	public double getRank() {
+		return rank;
+	}
+
+	/**
+	 * @param rank the rank to set
+	 */
+	public void setRank(double rank) {
+		this.rank = rank;
+	}
 }

@@ -162,7 +162,7 @@ public class BasicClustering implements ClusteringInterface {
     protected final Job addTasks2Job(List taskList) {
         if (taskList != null && !taskList.isEmpty()) {
             int length = 0;
-
+            double rank=0.0;
             int userId = 0;
             int priority = 0;
             int depth = 0;
@@ -171,6 +171,7 @@ public class BasicClustering implements ClusteringInterface {
             for (Iterator it = taskList.iterator(); it.hasNext();) {
                 Task task = (Task) it.next();
                 length += task.getCloudletLength();
+                rank=task.getRank();
 
                 userId = task.getUserId();
                 priority = task.getPriority();
@@ -214,6 +215,7 @@ public class BasicClustering implements ClusteringInterface {
             job.setUserId(userId);
             job.setDepth(depth);
             job.setPriority(priority);
+            job.setRank(rank);
 
             idIndex++;
             getJobList().add(job);

@@ -29,13 +29,11 @@ import org.workflowsim.Task;
 /**
  * The HEFT planning algorithm.
  * 
- * @author Pedro Paulo Vezzá Campos
- * @date Oct 12, 2013
  */
 public class HEFTPlanner extends BasePlanningAlgorithm {
         private Map<Task, Map<CondorVM, Double>> computationCosts;
         private Map<Task, Map<Task, Double>> transferCosts;
-        private Map<Task, Double> rank;
+        private Map<Task, Double> rank_map;
 
         private Map<CondorVM, List<Event>> schedules;
         private Map<Task, Double> earliestFinishTimes;
@@ -72,7 +70,7 @@ public class HEFTPlanner extends BasePlanningAlgorithm {
         public HEFTPlanner() {
                 computationCosts = new HashMap<>();
                 transferCosts = new HashMap<>();
-                rank = new HashMap<>();
+                rank_map = new HashMap<>();
                 earliestFinishTimes = new HashMap<>();
                 schedules = new HashMap<>();
         }
@@ -216,8 +214,8 @@ public class HEFTPlanner extends BasePlanningAlgorithm {
          * @return The rank
          */
         private double calculateRank(Task task) {
-                if (rank.containsKey(task))
-                        return rank.get(task);
+                if (rank_map.containsKey(task))
+                        return rank_map.get(task);
 
                 double averageComputationCost = 0.0;
 
@@ -233,9 +231,9 @@ public class HEFTPlanner extends BasePlanningAlgorithm {
                         max = Math.max(max, childCost);
                 }
 
-                rank.put(task, averageComputationCost + max);
+                rank_map.put(task, averageComputationCost + max);
 
-                return rank.get(task);
+                return rank_map.get(task);
         }
 
         /**
@@ -243,14 +241,14 @@ public class HEFTPlanner extends BasePlanningAlgorithm {
          */
         private void allocateTasks() {
                 List<TaskRank> taskRank = new ArrayList<>();
-                for (Task task : rank.keySet()) {
-                        taskRank.add(new TaskRank(task, rank.get(task)));
+                for (Task task : rank_map.keySet()) {
+                        taskRank.add(new TaskRank(task, rank_map.get(task)));
                 }
 
                 // Sorting in non-ascending order of rank
                 Collections.sort(taskRank);
                 for (TaskRank tr : taskRank) {
-                        allocateTask(tr.task);
+                        allocateTask(tr.task,tr.rank);
                 }
 
         }
@@ -263,7 +261,7 @@ public class HEFTPlanner extends BasePlanningAlgorithm {
          *            The task to be scheduled
          * @pre All parent tasks are already scheduled
          */
-        private void allocateTask(Task task) {
+        private void allocateTask(Task task,double rank) {
                 CondorVM chosenVM = null;
                 double earliestFinishTime = Double.MAX_VALUE;
                 double bestReadyTime = 0.0;
@@ -293,7 +291,10 @@ public class HEFTPlanner extends BasePlanningAlgorithm {
                 findFinishTime(task, chosenVM, bestReadyTime, true);
                 earliestFinishTimes.put(task, earliestFinishTime);
 
+                //Here we set the rank of the tasks.
                 task.setVmId(chosenVM.getId());
+                task.setRank(rank);
+                Log.printLine("In the HEFTPlanning, the taskId is "+task.getCloudletId()+" the vmId is "+chosenVM.getId()+" and the rank is "+rank);
         }
 
         /**

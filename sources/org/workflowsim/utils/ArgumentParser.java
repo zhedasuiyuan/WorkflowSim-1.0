@@ -287,10 +287,15 @@ public class ArgumentParser {
              * be set as STATIC_SCH to avoid unnecessary change during the runtime
              */
             if(!pln_method.equals(PlanningAlgorithm.INVALID)){
-                if(sch_method != SchedulingAlgorithm.STATIC_SCH || sch_method != SchedulingAlgorithm.INVALID_SCH){
+                
+                if(pln_method.equals(PlanningAlgorithm.HEFT)&&sch_method.equals(SchedulingAlgorithm.HEFT_SCH)){
+                
+                Log.printLine("Hahaha-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                }else if(sch_method != SchedulingAlgorithm.STATIC_SCH || sch_method != SchedulingAlgorithm.INVALID_SCH){
                     Log.printLine("Warning: your scheduler.method is reset to be STATIC_SCH");
+                    sch_method = SchedulingAlgorithm.STATIC_SCH;
                 }
-                sch_method = SchedulingAlgorithm.STATIC_SCH;
+                   
             }
             
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,

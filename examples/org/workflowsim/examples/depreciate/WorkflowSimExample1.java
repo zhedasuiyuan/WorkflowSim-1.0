@@ -79,7 +79,7 @@ public class WorkflowSimExample1 {
 
         //create VMs
         CondorVM[] vm = new CondorVM[vms];
-
+//TODO
         for (int i = 0; i < vms; i++) {
             double ratio = 1.0;
             vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
@@ -130,7 +130,7 @@ public class WorkflowSimExample1 {
             /**
              * Create a WorkflowPlanner with one schedulers.
              */
-            WorkflowPlanner wfPlanner = new WorkflowPlanner("planner_0", 1);
+            WorkflowPlanner wfPlanner = new WorkflowPlanner("planner_0", 1);//The second variable is the number of schedulers. Why this necessary?
             /**
              * Create a WorkflowEngine.
              */

@@ -132,7 +132,7 @@ public class DatacenterBroker extends SimEntity {
 	 * @post $none
 	 */
 	public void bindCloudletToVm(int cloudletId, int vmId) {
-		CloudletList.getById(getCloudletList(), cloudletId).setVmId(vmId);
+		CloudletList.getById(getCloudletList(), cloudletId).setVmId(vmId);//This method was used in the process of planning and scheduling
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class DatacenterBroker extends SimEntity {
 
 		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList().size()) {
 			setDatacenterRequestedIdsList(new ArrayList<Integer>());
-			createVmsInDatacenter(getDatacenterIdsList().get(0));
+			createVmsInDatacenter(getDatacenterIdsList().get(0));//why create the vm here?
 		}
 	}
 
@@ -321,7 +321,7 @@ public class DatacenterBroker extends SimEntity {
 			if (!getVmsToDatacentersMap().containsKey(vm.getId())) {
 				Log.printLine(CloudSim.clock() + ": " + getName() + ": Trying to Create VM #" + vm.getId()
 						+ " in " + datacenterName);
-				sendNow(datacenterId, CloudSimTags.VM_CREATE_ACK, vm);
+				sendNow(datacenterId, CloudSimTags.VM_CREATE_ACK, vm);//ACK means that we need the acknowledgement.
 				requestedVms++;
 			}
 		}

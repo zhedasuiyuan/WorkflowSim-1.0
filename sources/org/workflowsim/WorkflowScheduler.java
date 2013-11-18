@@ -18,11 +18,13 @@ package org.workflowsim;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
+import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
@@ -31,6 +33,7 @@ import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.scheduling.DataAwareSchedulingAlgorithm;
 import org.workflowsim.scheduling.BaseSchedulingAlgorithm;
 import org.workflowsim.scheduling.FCFSSchedulingAlgorithm;
+import org.workflowsim.scheduling.HEFTSchedulingAlgorithm;
 import org.workflowsim.scheduling.MCTSchedulingAlgorithm;
 import org.workflowsim.scheduling.MaxMinSchedulingAlgorithm;
 import org.workflowsim.scheduling.MinMinSchedulingAlgorithm;
@@ -43,6 +46,10 @@ import org.workflowsim.utils.Parameters.SchedulingAlgorithm;
  * VM management, as vm creation, sumbission of jobs to this VMs and destruction
  * of VMs.
  * It picks up a scheduling algorithm based on the configuration
+ * 
+ * Use createVmsInDatacenter(nextDatacenterId) to create the vm 
+ * Use sendNow(getVmsToDatacentersMap().get(vm.getId()), CloudSimTags.VM_DESTROY, vm); to destory the vm
+ * Vm list is the list that we want to create, and the getVmsCreatedList() is the list that contains the vms already created.
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -104,27 +111,28 @@ public class WorkflowScheduler extends DatacenterBroker {
             case CloudSimTags.RESOURCE_CHARACTERISTICS:
                 processResourceCharacteristics(ev);
                 break;
-            // VM Creation answer
+            // VM Creation answer to know whether the creation is sucessful.
             case CloudSimTags.VM_CREATE_ACK:
                 processVmCreate(ev);
                 break;
-            // A finished cloudlet returned
+            
             case WorkflowSimTags.CLOUDLET_CHECK:
                 processCloudletReturn(ev);
                 break;
+             // A finished cloudlet returned
             case CloudSimTags.CLOUDLET_RETURN:
-                processCloudletReturn(ev);
+                processCloudletReturn(ev);  //change some staus of the job lists and notify the workflow Engine
                 break;
             // if the simulation finishes
             case CloudSimTags.END_OF_SIMULATION:
                 shutdownEntity();
                 break;
-            case CloudSimTags.CLOUDLET_SUBMIT:
-                processCloudletSubmit(ev);
-                break;
+            case CloudSimTags.CLOUDLET_SUBMIT:             //it should handle the submitted cloudlet
+                processCloudletSubmit(ev);                 //Nearly did nothing and then cloudlet update
+                break;                                    //setup the getCloudletList()
 
             case WorkflowSimTags.CLOUDLET_UPDATE:
-                processCloudletUpdate(ev);
+                processCloudletUpdate(ev);     //Get the scheduler and set the task list and vm list.
                 break;
             // other unknown tags are processed by this method
             default:
@@ -163,9 +171,14 @@ public class WorkflowScheduler extends DatacenterBroker {
                 break;
             case STATIC_SCH:
                 algorithm = new StaticSchedulingAlgorithm();
+//                algorithm= new HEFTSchedulingAlgorithm();
                 break;
+            case HEFT_SCH:
+            	algorithm= new HEFTSchedulingAlgorithm();
+            	break;
             default:
                 algorithm = new StaticSchedulingAlgorithm();
+//                algorithm= new HEFTSchedulingAlgorithm();
                 break;
 
         }
@@ -233,8 +246,10 @@ public class WorkflowScheduler extends DatacenterBroker {
         }
     }
 
+    
+//TODO 
     /**
-     * Update a cloudlet (job)
+     * Update a cloudlet (job) why should we update?
      *
      * @param ev a simEvent object
      */
@@ -242,7 +257,7 @@ public class WorkflowScheduler extends DatacenterBroker {
 
         BaseSchedulingAlgorithm scheduler = getScheduler(Parameters.getSchedulingAlgorithm());
         scheduler.setCloudletList(getCloudletList());
-        scheduler.setVmList(getVmsCreatedList());
+        scheduler.setVmList(getVmsCreatedList());   //Remember the VMList.
 
         try {
             scheduler.run();
@@ -259,7 +274,7 @@ public class WorkflowScheduler extends DatacenterBroker {
             if(Parameters.getOverheadParams().getQueueDelay()!=null){
                 delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
             }
-            schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
+            schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);//Go to the certain datacenter
 
         }
         getCloudletList().removeAll(scheduledList);
@@ -286,8 +301,8 @@ public class WorkflowScheduler extends DatacenterBroker {
          */
         FailureGenerator.generate(job);
 
-        getCloudletReceivedList().add(cloudlet);
-        getCloudletSubmittedList().remove(cloudlet);
+        getCloudletReceivedList().add(cloudlet);// received from the data center??
+        getCloudletSubmittedList().remove(cloudlet); // submitted to the data center??
 
         CondorVM vm = (CondorVM) getVmsCreatedList().get(cloudlet.getVmId());
         //so that this resource is released
@@ -297,12 +312,12 @@ public class WorkflowScheduler extends DatacenterBroker {
         if(Parameters.getOverheadParams().getPostDelay()!=null){
             delay = Parameters.getOverheadParams().getPostDelay(job);
         }
-        schedule(this.workflowEngineId, delay, CloudSimTags.CLOUDLET_RETURN, cloudlet);
+        schedule(this.workflowEngineId, delay, CloudSimTags.CLOUDLET_RETURN, cloudlet);//determine new available cloudlets???
 
         cloudletsSubmitted--;
         //not really update right now, should wait 1 s until many jobs have returned
 
-        schedule(this.getId(), 0.0, WorkflowSimTags.CLOUDLET_UPDATE);
+        schedule(this.getId(), 0.0, WorkflowSimTags.CLOUDLET_UPDATE); //Running the scheduling algorithm
 
     }
 
@@ -384,7 +399,7 @@ public class WorkflowScheduler extends DatacenterBroker {
 
     /**
      * Process a request for the characteristics of a PowerDatacenter.
-     *
+     *    I don't know why we need it.
      * @param ev a SimEvent object
      * @pre ev != $null
      * @post $none
@@ -401,4 +416,10 @@ public class WorkflowScheduler extends DatacenterBroker {
             sendNow(datacenterId, CloudSimTags.RESOURCE_CHARACTERISTICS, getId());
         }
     }
+    
+    protected void destoryVm(int vmId) {			
+    	Log.printLine(CloudSim.clock() + ": " + getName() + ": Destroying VM #" + vmId);
+		sendNow(getVmsToDatacentersMap().get(vmId), CloudSimTags.VM_DESTROY, VmList.getById(getVmsCreatedList(), vmId));
+		getVmsCreatedList().remove(VmList.getById(getVmsCreatedList(), vmId));
+	}
 }
