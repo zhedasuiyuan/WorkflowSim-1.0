@@ -25,6 +25,9 @@ import org.cloudbus.cloudsim.lists.VmList;
  * DatacentreBroker represents a broker acting on behalf of a user. It hides VM management, as vm
  * creation, sumbission of cloudlets to this VMs and destruction of VMs.
  * 
+ * In the method of startEntity, which was called by the CloudSimCore, we start the datacenter characteristics request and get the characteristics. After
+ * that, we create the vms in the first datacenter.
+ * 
  * @author Rodrigo N. Calheiros
  * @author Anton Beloglazov
  * @since CloudSim Toolkit 1.0
@@ -181,11 +184,11 @@ public class DatacenterBroker extends SimEntity {
 	 */
 	protected void processResourceCharacteristics(SimEvent ev) {
 		DatacenterCharacteristics characteristics = (DatacenterCharacteristics) ev.getData();
-		getDatacenterCharacteristicsList().put(characteristics.getId(), characteristics);
+		getDatacenterCharacteristicsList().put(characteristics.getId(), characteristics);  //combine the datacenter with the characteristics.
 
 		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList().size()) {
 			setDatacenterRequestedIdsList(new ArrayList<Integer>());
-			createVmsInDatacenter(getDatacenterIdsList().get(0));//why create the vm here?
+			createVmsInDatacenter(getDatacenterIdsList().get(0));
 		}
 	}
 
@@ -197,11 +200,11 @@ public class DatacenterBroker extends SimEntity {
 	 * @post $none
 	 */
 	protected void processResourceCharacteristicsRequest(SimEvent ev) {
-		setDatacenterIdsList(CloudSim.getCloudResourceList());
+		setDatacenterIdsList(CloudSim.getCloudResourceList()); //set the number of datacenters and the IDs.
 		setDatacenterCharacteristicsList(new HashMap<Integer, DatacenterCharacteristics>());
 
 		Log.printLine(CloudSim.clock() + ": " + getName() + ": Cloud Resource List received with "
-				+ getDatacenterIdsList().size() + " resource(s)");
+				+ getDatacenterIdsList().size() + " resource(s)");// The number of datacenter
 
 		for (Integer datacenterId : getDatacenterIdsList()) {
 			sendNow(datacenterId, CloudSimTags.RESOURCE_CHARACTERISTICS, getId());
@@ -222,8 +225,8 @@ public class DatacenterBroker extends SimEntity {
 		int result = data[2];
 
 		if (result == CloudSimTags.TRUE) {
-			getVmsToDatacentersMap().put(vmId, datacenterId);
-			getVmsCreatedList().add(VmList.getById(getVmList(), vmId));
+			getVmsToDatacentersMap().put(vmId, datacenterId);//add one relationship
+			getVmsCreatedList().add(VmList.getById(getVmList(), vmId)); //add one created vm to the createdList
 			Log.printLine(CloudSim.clock() + ": " + getName() + ": VM #" + vmId
 					+ " has been created in Datacenter #" + datacenterId + ", Host #"
 					+ VmList.getById(getVmsCreatedList(), vmId).getHost().getId());
@@ -235,7 +238,7 @@ public class DatacenterBroker extends SimEntity {
 		incrementVmsAcks();
 
 		// all the requested VMs have been created
-		if (getVmsCreatedList().size() == getVmList().size() - getVmsDestroyed()) {
+		if (getVmsCreatedList().size() == getVmList().size() - getVmsDestroyed()) { //This is where we submit the cloudlets.
 			submitCloudlets();
 		} else {
 			// all the acks received, but some VMs were not created
@@ -321,7 +324,7 @@ public class DatacenterBroker extends SimEntity {
 			if (!getVmsToDatacentersMap().containsKey(vm.getId())) {
 				Log.printLine(CloudSim.clock() + ": " + getName() + ": Trying to Create VM #" + vm.getId()
 						+ " in " + datacenterName);
-				sendNow(datacenterId, CloudSimTags.VM_CREATE_ACK, vm);//ACK means that we need the acknowledgement.
+				sendNow(datacenterId, CloudSimTags.VM_CREATE_ACK, vm);//ACK means that we need the acknowledgment.
 				requestedVms++;
 			}
 		}
@@ -359,7 +362,7 @@ public class DatacenterBroker extends SimEntity {
 			cloudlet.setVmId(vm.getId());
 			sendNow(getVmsToDatacentersMap().get(vm.getId()), CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
 			cloudletsSubmitted++;
-			vmIndex = (vmIndex + 1) % getVmsCreatedList().size();
+			vmIndex = (vmIndex + 1) % getVmsCreatedList().size();  //try all the vms.
 			getCloudletSubmittedList().add(cloudlet);
 		}
 

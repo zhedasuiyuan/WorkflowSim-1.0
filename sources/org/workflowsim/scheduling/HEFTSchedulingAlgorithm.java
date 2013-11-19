@@ -55,7 +55,7 @@ public class HEFTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         for (int t = 0; t < size; t++) {
             hasChecked.add(false);
             Task tmp = (Task) getCloudletList().get(t);
-            Log.printLine(tmp.getCloudletId()+" ");
+            Log.print(tmp.getCloudletId()+" ");
         }
         Log.printLine();
         for (int i = 0; i < size; i++) {

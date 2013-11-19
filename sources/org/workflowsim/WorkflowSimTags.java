@@ -46,6 +46,14 @@ public class WorkflowSimTags {
     public static final int CLOUDLET_CHECK = BASE + 6;
 
     /**
+     * VM types
+     */
+    public static final int TINY=BASE+10;
+    public static final int SMALL=BASE+11;
+    public static final int MEDIUM=BASE+12;
+    public static final int LARGE=BASE+13;
+    public static final int XLARGE=BASE+14;
+    /**
      * Private Constructor
      */
     private WorkflowSimTags() {

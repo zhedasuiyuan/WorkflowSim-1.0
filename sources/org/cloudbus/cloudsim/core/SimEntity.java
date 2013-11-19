@@ -138,7 +138,7 @@ public abstract class SimEntity implements Cloneable {
 	 * @param tag An user-defined number representing the type of event.
 	 * @param data The data to be sent with the event.
 	 */
-	public void scheduleNow(int dest, int tag, Object data) {
+	public void scheduleNow(int dest, int tag, Object data) {  // What's the difference between scheduleNow and SendNow
 		schedule(dest, 0, tag, data);
 	}
 
@@ -541,7 +541,7 @@ public abstract class SimEntity implements Cloneable {
 			delay += getNetworkDelay(srcId, entityId);
 		}
 
-		schedule(entityId, delay, cloudSimTag, data);
+		schedule(entityId, delay, cloudSimTag, data);//Send is also implemented by the schedule algorithm. Only difference is that 'send' contains the network delay.
 	}
 
 	/**

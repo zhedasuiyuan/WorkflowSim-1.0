@@ -90,7 +90,7 @@ public class WorkflowEngine extends SimEntity {
         setSchedulerIds(new ArrayList<Integer>());
 
         for (int i = 0; i < schedulers; i++) {
-            WorkflowScheduler wfs = new WorkflowScheduler(name + "_Scheduler_" + i);
+            WorkflowScheduler wfs = new WorkflowScheduler(name + "_Scheduler_" + i);//Scheduler is the workflowScheduler not the exact scheduling algorithms
             getSchedulers().add(wfs);
             getSchedulerIds().add(wfs.getId());
             wfs.setWorkflowEngineId(this.getId());

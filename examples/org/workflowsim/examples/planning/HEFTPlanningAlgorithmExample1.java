@@ -123,8 +123,8 @@ public class HEFTPlanningAlgorithmExample1 {
              * Since we are using HEFT planning algorithm, the scheduling algorithm should be static 
              * such that the scheduler would not override the result of the planner
              */
-//            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.HEFT_SCH;//The default algorithm is the static_sch
-            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC_SCH;
+            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.HEFT_SCH;//The default algorithm is the static_sch
+//            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC_SCH;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
@@ -211,7 +211,7 @@ public class HEFTPlanningAlgorithmExample1 {
         //    create a list to store these PEs before creating
         //    a Machine.
         int hostId = 0;
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= 40; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
             // 3. Create PEs and add these into the list.
@@ -263,12 +263,15 @@ public class HEFTPlanningAlgorithmExample1 {
 
         Random bwRandom = new Random(System.currentTimeMillis());
 
+        //When you create a 
+        //The VM network
+        int VmNumTmp=Parameters.getVmNum()+2;
         try {
-            DistributedClusterStorage s1 = new DistributedClusterStorage(name, 1e12, Parameters.getVmNum(), intraBandwidth);
-            double[][] bws = new double[Parameters.getVmNum()][Parameters.getVmNum()];
-            for (int src = 0; src < Parameters.getVmNum(); src++) {
+            DistributedClusterStorage s1 = new DistributedClusterStorage(name, 1e12, VmNumTmp, intraBandwidth);
+            double[][] bws = new double[VmNumTmp][VmNumTmp];
+            for (int src = 0; src < VmNumTmp; src++) {
                 bws[src][src] = Double.MAX_VALUE;
-                for (int dest = src; dest < Parameters.getVmNum(); dest++) {
+                for (int dest = src; dest < VmNumTmp; dest++) {
                     double bw = intraBandwidth * bwRandom.nextDouble();
                     bws[src][dest] = bw;
                     bws[dest][src] = bw;

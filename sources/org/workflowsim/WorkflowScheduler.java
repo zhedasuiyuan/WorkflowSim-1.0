@@ -15,11 +15,14 @@
  */
 package org.workflowsim;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
@@ -247,7 +250,6 @@ public class WorkflowScheduler extends DatacenterBroker {
     }
 
     
-//TODO 
     /**
      * Update a cloudlet (job) why should we update?
      *
@@ -257,8 +259,16 @@ public class WorkflowScheduler extends DatacenterBroker {
 
         BaseSchedulingAlgorithm scheduler = getScheduler(Parameters.getSchedulingAlgorithm());
         scheduler.setCloudletList(getCloudletList());
+               
+        //create the number of vm based on the number of cloudlets.
+        int tmpNum=getCloudletList().size()-getVmsCreatedList().size();
+        if(tmpNum>0){
+        	createVms(getDatacenterIdsList().get(0),0.0,WorkflowSimTags.TINY,tmpNum);
+        	Log.printLine("The value of tmpNum is "+tmpNum);
+        }else{
+//        	destoryVm();
+        }
         scheduler.setVmList(getVmsCreatedList());   //Remember the VMList.
-
         try {
             scheduler.run();
         } catch (Exception e) {
@@ -285,7 +295,7 @@ public class WorkflowScheduler extends DatacenterBroker {
 
     /**
      * Process a cloudlet (job) return event.
-     *
+     * CloudletReturn from the datacenter.
      * @param ev a SimEvent object
      * @pre ev != $null
      * @post $none
@@ -312,11 +322,13 @@ public class WorkflowScheduler extends DatacenterBroker {
         if(Parameters.getOverheadParams().getPostDelay()!=null){
             delay = Parameters.getOverheadParams().getPostDelay(job);
         }
-        schedule(this.workflowEngineId, delay, CloudSimTags.CLOUDLET_RETURN, cloudlet);//determine new available cloudlets???
+        schedule(this.workflowEngineId, delay, CloudSimTags.CLOUDLET_RETURN, cloudlet);//determine new available cloudlets. Check the parents Nodes.
 
         cloudletsSubmitted--;
+ 
         //not really update right now, should wait 1 s until many jobs have returned
-
+        //Here if we update right now, maybe we will get nothing from the scheduling engine.
+//TODO  why we need to start the update process here? Still cannot understand why we need to call this method.
         schedule(this.getId(), 0.0, WorkflowSimTags.CLOUDLET_UPDATE); //Running the scheduling algorithm
 
     }
@@ -417,9 +429,95 @@ public class WorkflowScheduler extends DatacenterBroker {
         }
     }
     
-    protected void destoryVm(int vmId) {			
-    	Log.printLine(CloudSim.clock() + ": " + getName() + ": Destroying VM #" + vmId);
-		sendNow(getVmsToDatacentersMap().get(vmId), CloudSimTags.VM_DESTROY, VmList.getById(getVmsCreatedList(), vmId));
+    /**
+     * Destroy the Vm with certain delay.
+     * @param vmId
+     * @param delay
+     */
+    protected void destoryVm(int vmId, double delay) {			
+    	Log.printLine(CloudSim.clock() +delay+": " + getName() + ": Destroying VM #" + vmId+" in workflowScheduler");
+		send(getVmsToDatacentersMap().get(vmId), delay,CloudSimTags.VM_DESTROY, VmList.getById(getVmsCreatedList(), vmId));
 		getVmsCreatedList().remove(VmList.getById(getVmsCreatedList(), vmId));
+		vmsDestroyed++;//We delete one vm		
+	}
+
+    
+    /**
+     * Destroy the vm as you need right now.
+     * @param vmId
+     */
+    protected void destoryVm(int vmId) {			
+    	destoryVm(vmId,0.0);
+	}
+    /**
+     * wfEngine.getSchedulerId(0) is the userID. That is the workflowscheduler ID.
+     * @param userId
+     * @param vms
+     * @return
+     */
+    protected List<CondorVM> createVM(int type,int vms) {
+
+        //Creates a container to store VMs. This list is passed to the broker later
+        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
+      //VM Parameters
+        long size = 10000; //image size (MB)
+        int ram = 512; //vm memory (MB)
+        int mips = 1000;
+        long bw = 1000;
+        int pesNumber = 1; //number of cpus
+        String vmm = "Xen"; //VMM name
+        
+        if(type==WorkflowSimTags.TINY){
+        	
+        }else if(type==WorkflowSimTags.SMALL){
+        	ram*=4;
+        }else if(type==WorkflowSimTags.MEDIUM){
+        	ram*=8;
+        	pesNumber*=2;
+        }else if(type==WorkflowSimTags.LARGE){
+        	ram*=16;
+        	pesNumber*=4;
+        }else if(type==WorkflowSimTags.XLARGE){
+        	ram*=32;
+        	pesNumber*=8;
+        }
+        
+
+        //create VMs
+        CondorVM[] vm = new CondorVM[vms];
+
+        for (int i = 0; i < vms; i++) {
+            double ratio = 1.0;
+            vm[i] = new CondorVM(getVmList().size()+i, this.getId(), mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
+            list.add(vm[i]);
+        }
+
+        return list;
+    }
+
+    /**
+	 * Create the virtual machines in a datacenter.
+	 * 
+	 * @param datacenterId Id of the chosen PowerDatacenter
+	 * @pre $none
+	 * @post $none
+	 */
+	protected void createVms(int datacenterId,double delay,int type,int vms) { //The ID of the first datacenter is 0
+		// send as much vms as possible for this datacenter before trying the next one
+		int requestedVms = 0;
+		String datacenterName =CloudSim.getEntityName(datacenterId);
+		List<CondorVM> newVMList=createVM(type,vms);
+		for (Vm vm : newVMList) {
+			if (!getVmsToDatacentersMap().containsKey(vm.getId())) {
+				Log.printLine(CloudSim.clock() +delay+ ": " + getName() + ": Trying to Create VM #" + vm.getId()
+						+ " in " + datacenterName);
+				send(datacenterId,delay, CloudSimTags.VM_CREATE_ACK, vm);//ACK means that we need the acknowledgment.
+				requestedVms++;
+			}
+		}
+		getVmList().addAll(newVMList);//Add the new list to the vmList.
+		getDatacenterRequestedIdsList().add(datacenterId);
+		setVmsRequested(requestedVms+getVmsRequested());
+//		setVmsAcks(getVmsAcks());
 	}
 }

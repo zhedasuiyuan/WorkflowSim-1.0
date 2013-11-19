@@ -156,7 +156,8 @@ public class DatacenterExtended extends Datacenter {
             Log.printLine(getName() + ".processCloudletSubmit(): " + "ClassCastException error.");
 
         } catch (Exception e) {
-            Log.printLine(getName() + ".processCloudletSubmit(): " + "Exception error.");
+            Log.printLine(getName() + ".processCloudletSubmit(): " + "Exception error.------------");
+            Log.printLine(e.getStackTrace());
 
         }
 
